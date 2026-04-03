@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People Info Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 0 16px;
+            background: #f8f9fb;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        p.top-desc {
+            color: #555;
+            margin-top: 0;
+            margin-bottom: 24px;
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid #e3e3e3;
+        }
+
+        input, button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            cursor: pointer;
+            background: #111827;
+            color: white;
+            border: none;
+        }
+
+        button:hover {
+            opacity: 0.95;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            background: white;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .error {
+            color: #b00020;
+            margin-bottom: 12px;
+            background: #fff1f1;
+            border: 1px solid #f0caca;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .profile-wrap {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .profile-image img {
+            width: 220px;
+            max-width: 100%;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        a {
+            color: #0b57d0;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .empty-text {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>People Info Bot</h1>
+    <p class="top-desc">Find public info: role, degree, affiliation, email, LinkedIn, and image.</p>
+
+    <form method="post">
+        <input type="text" name="name" placeholder="Enter full name" required>
+        <input type="text" name="hint" placeholder="Hint (school, city, company...)">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+        <div class="card">
+            <div class="profile-wrap">
+                {% if result.image_url %}
+                    <div class="profile-image">
+                        <img src="{{ result.image_url }}" alt="{{ result.query_name }}">
+                    </div>
+                {% endif %}
+
+                <div class="profile-info">
+                    <p><span class="label">Name:</span> {{ result.query_name }}</p>
+                    <p><span class="label">Hint:</span> {{ result.hint or "None" }}</p>
+                    <p><span class="label">Role:</span> {{ result.role or "Not found" }}</p>
+                    <p><span class="label">Degree:</span> {{ result.degree or "Not found" }}</p>
+                    <p><span class="label">Current affiliation:</span> {{ result.current_affiliation or "Not found" }}</p>
+                    <p><span class="label">Public email:</span> {{ result.public_email or "Not found" }}</p>
+
+                    <p>
+                        <span class="label">LinkedIn:</span>
+                        {% if result.linkedin %}
+                            <a href="{{ result.linkedin }}" target="_blank">{{ result.linkedin }}</a>
+                        {% else %}
+                            Not found
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div style="margin-top: 18px;">
+                <p class="label">Sources:</p>
+                {% if result.sources %}
+                    <ul>
+                        {% for src in result.sources %}
+                            <li><a href="{{ src }}" target="_blank">{{ src }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty-text">No sources found.</p>
+                {% endif %}
+            </div>
+
+            {% if result.notes %}
+                <div style="margin-top: 18px;">
+                    <p class="label">Notes:</p>
+                    <ul>
+                        {% for note in result.notes %}
+                            <li>{{ note }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</body>
+</html>
